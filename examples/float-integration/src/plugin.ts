@@ -112,7 +112,7 @@ const SMOKE_DATA: Record<string, unknown> = {
   '/timeoffs': [
     { timeoff_id: 1, timeoff_type_id: 1, people_ids: [1], start_date: '2026-01-12', end_date: '2026-01-16' },
   ],
-  '/clients': [{ client_id: 1, name: 'Acme Corp' }],
+  '/clients': [{ client_id: 1, name: 'Example Client' }],
 };
 
 /**
