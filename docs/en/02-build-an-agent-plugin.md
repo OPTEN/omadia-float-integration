@@ -2,7 +2,7 @@
 
 An **agent** is a skill the orchestrator can pick and call. It declares one or
 more tools (`capabilities`) and implements them in code. The worked example is
-[`examples/float-integration`](../../examples/float-integration) — `@acme/integration-float`,
+[`examples/float-integration`](../../examples/float-integration) — `@opten/float-integration`,
 a read-only connector for the Float resource-planning API.
 
 ## The contract
@@ -10,7 +10,7 @@ a read-only connector for the Float resource-planning API.
 ```ts
 import type { PluginContext } from '@omadia/plugin-api';
 
-export const AGENT_ID = '@acme/integration-float' as const;
+export const AGENT_ID = '@opten/float-integration' as const;
 
 export interface AgentHandle {
   close(): Promise<void>;
@@ -126,7 +126,7 @@ other agents reference the partial.
 
 ```bash
 npm run build -w examples/float-integration
-# → examples/float-integration/out/acme-integration-float-0.1.0.zip
+# → examples/float-integration/out/opten-float-integration-0.1.0.zip
 ```
 
 Upload via **admin UI → Store → Upload**, fill the setup form, and prompt the

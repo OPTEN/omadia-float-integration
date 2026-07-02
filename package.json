@@ -1,14 +1,14 @@
 {
-  "name": "omadia-plugin-starter",
+  "name": "omadia-float-integration",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Starter template for building Omadia plugins and channels, with a one-command ZIP build for upload.",
+  "description": "Omadia integration plugin for Float (float.com): read-only access to people, projects, allocations, time off and clients.",
   "license": "MIT",
-  "homepage": "https://github.com/byte5ai/omadia-plugin-starter",
+  "homepage": "https://github.com/OPTEN/omadia-float-integration",
   "repository": {
     "type": "git",
-    "url": "https://github.com/byte5ai/omadia-plugin-starter.git"
+    "url": "https://github.com/OPTEN/omadia-float-integration.git"
   },
   "workspaces": [
     "examples/*"

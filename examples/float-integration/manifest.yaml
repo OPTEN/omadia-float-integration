@@ -1,24 +1,21 @@
 schema_version: "1"
 
 # ===========================================================================
-# @acme/integration-float — Omadia integration for Float (float.com), the
+# @opten/float-integration — Omadia integration for Float (float.com), the
 # resource-planning tool. Read-only v1: people, projects, allocations,
 # time off, clients.
-# Rename every "@acme/integration-float" / "Your Name" placeholder before
-# publishing.
 # ===========================================================================
 
 identity:
-  id: "@acme/integration-float"      # MUST equal package.json "name"
+  id: "@opten/float-integration"      # MUST equal package.json "name"
   kind: "integration"
   domain: "float"
   name: "Float"
   version: "0.1.0"                   # MUST equal package.json "version"
   description: "Read-only Float (float.com) integration: query people, projects, allocations, time off and clients from your resource plan."
   authors:
-    - name: "Your Name"
-      email: "you@example.com"
-      url: "https://example.com"
+    - name: "OPTEN"
+      url: "https://www.opten.ch"
   license: "MIT"
   icon: "./assets/icon.svg"
   categories:

@@ -1,4 +1,4 @@
-# Example: `@acme/integration-float`
+# Example: `@opten/float-integration`
 
 An omadia **integration** plugin for [Float](https://www.float.com), the
 resource-planning tool. It exposes read-only tools over the
@@ -42,14 +42,14 @@ contact email is sent in the `User-Agent` header, as Float requests.
 ```bash
 npm install                 # once, from the repo root
 npm run build -w examples/float-integration
-# → examples/float-integration/out/acme-integration-float-0.1.0.zip
+# → examples/float-integration/out/opten-float-integration-0.1.0.zip
 ```
 
 Upload that ZIP in the omadia admin UI (**Store → Upload**).
 
 ## Make it yours
 
-1. Rename `@acme/integration-float` → your reverse-DNS id in `package.json`
+1. Rename `@opten/float-integration` → your reverse-DNS id in `package.json`
    **and** `manifest.yaml` (`identity.id`), and update the `authors` block.
 2. Add write tools (create/update allocations or time off) by registering more
    tools in `src/plugin.ts` and mirroring them under `capabilities` — mark them

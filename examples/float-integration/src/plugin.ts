@@ -4,7 +4,7 @@ import type { HttpAccessor, PluginContext } from '@omadia/plugin-api';
  * Reverse-DNS identity — MUST equal `identity.id` in manifest.yaml and the
  * `name` field of package.json.
  */
-export const AGENT_ID = '@acme/integration-float' as const;
+export const AGENT_ID = '@opten/float-integration' as const;
 
 const FLOAT_API_BASE = 'https://api.float.com/v3';
 const DEFAULT_PER_PAGE = 50;

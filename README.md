@@ -50,7 +50,7 @@ nvm use            # or: install Node >= 20
 npm install        # installs the shared toolchain (workspaces)
 
 # Pick an example, build its upload ZIP:
-npm run build:float      # → examples/float-integration/out/acme-integration-float-0.1.0.zip
+npm run build:float      # → examples/float-integration/out/opten-float-integration-0.1.0.zip
 npm run build:channel    # → examples/channel/out/acme-channel-webhook-0.1.0.zip
 
 # …or typecheck / build everything:
@@ -98,7 +98,7 @@ omadia-plugin-starter/
 │   ├── omadia-plugin-api.d.ts
 │   └── omadia-channel-sdk.d.ts
 └── examples/
-    ├── float-integration/       ← @acme/integration-float
+    ├── float-integration/       ← @opten/float-integration
     └── channel/                 ← @acme/channel-webhook
 ```
 

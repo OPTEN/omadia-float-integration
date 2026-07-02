@@ -3,7 +3,7 @@
 Ein **Agent** ist eine Fähigkeit, die der Orchestrator auswählen und aufrufen
 kann. Er deklariert ein oder mehrere Tools (`capabilities`) und implementiert
 sie im Code. Das ausgearbeitete Beispiel ist
-[`examples/float-integration`](../../examples/float-integration) — `@acme/integration-float`,
+[`examples/float-integration`](../../examples/float-integration) — `@opten/float-integration`,
 ein nur lesender Connector für die Float-Resource-Planning-API.
 
 ## Der Vertrag
@@ -11,7 +11,7 @@ ein nur lesender Connector für die Float-Resource-Planning-API.
 ```ts
 import type { PluginContext } from '@omadia/plugin-api';
 
-export const AGENT_ID = '@acme/integration-float' as const;
+export const AGENT_ID = '@opten/float-integration' as const;
 
 export interface AgentHandle {
   close(): Promise<void>;
@@ -131,7 +131,7 @@ Sie werden in die ZIP gebundelt und bei der Aktivierung geladen.
 
 ```bash
 npm run build -w examples/float-integration
-# → examples/float-integration/out/acme-integration-float-0.1.0.zip
+# → examples/float-integration/out/opten-float-integration-0.1.0.zip
 ```
 
 Über **Admin-UI → Store → Upload** hochladen, das Setup-Formular ausfüllen und
