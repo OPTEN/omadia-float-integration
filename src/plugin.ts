@@ -14,6 +14,221 @@ export interface IntegrationHandle {
   close(): Promise<void>;
 }
 
+// ---------------------------------------------------------------------------
+// Float API v3 — response type definitions
+// ---------------------------------------------------------------------------
+
+export interface FloatDepartment {
+  /** The ID of this department (read-only). */
+  department_id?: number;
+  /** Parent department ID, or null if top-level. */
+  parent_id?: number | null;
+  name: string;
+}
+
+export interface FloatPeopleTag {
+  name: string;
+}
+
+export interface FloatContract {
+  /** Date the contract starts (defaults to person's start_date). */
+  effective_date: string;
+  /** Role ID for the contract, or null if no role. */
+  role_id?: number | null;
+  role_name?: string | null;
+  cost_rate?: string | null;
+  /** Entity from which the cost rate is derived: "role" | "person" | null. */
+  cost_rate_from?: string | null;
+}
+
+/** Linked account as returned by `expand=account` on /people. */
+export interface FloatAccount {
+  /** Account ID (read-only). */
+  account_id?: number;
+  name: string;
+  email: string;
+  timezone?: string;
+  avatar?: string;
+  /**
+   * High-level permissions: 1 = Account Owner, 2 = Admin, 4 = Member,
+   * 5 = Billing, 7 = Manager.
+   */
+  account_type?: number;
+  /**
+   * Granular permissions (used together with account_type).
+   * Member: 1 = View all, 2 = Self-edit.
+   * Manager: 0 = No schedule mgmt, 1 = Manage Projects, 2 = Manage People,
+   * 3 = Manage Projects & People. +4 = Create & edit People, +8 = View rates.
+   */
+  access?: number;
+  department_filter_id?: number;
+  active?: number;
+  /** Last sign-in date (read-only). */
+  last_login?: string;
+  created?: string;
+  modified?: string;
+}
+
+/**
+ * /people endpoint — a person (team member, contractor, or placeholder).
+ * active: 1 = Active, 0 = Archived.
+ * people_type_id: 1 = Employee, 2 = Contractor, 3 = Placeholder, 4 = Role placeholder.
+ * employee_type: 1 = Full-time, 0 = Part-time.
+ */
+export interface FloatPerson {
+  /** Unique identifier (read-only). */
+  people_id?: number;
+  name: string;
+  email?: string;
+  /** Role name derived from role_id. */
+  job_title?: string;
+  role_id?: number;
+  department?: FloatDepartment;
+  notes?: string;
+  /** Thumbnail filename (read-only). */
+  avatar_file?: string;
+  /** Weekly email: 1 = Yes, 0 = No. */
+  auto_email?: number;
+  /** 1 = Full-time, 0 = Part-time. */
+  employee_type?: number;
+  /**
+   * Working hours per day indexed Sun–Sat, keyed by effective-date string
+   * (YYYY-MM-DD).
+   */
+  work_days_hours?: Record<string, number[]>;
+  /** 1 = Active, 0 = Archived. */
+  active?: number;
+  /** 1 = Employee, 2 = Contractor, 3 = Placeholder, 4 = Role placeholder. */
+  people_type_id?: number;
+  tags?: FloatPeopleTag[];
+  start_date?: string;
+  end_date?: string | null;
+  /** Default hourly rate (string to preserve decimal precision). */
+  default_hourly_rate?: string;
+  region_id?: number;
+  /** Date created (read-only). */
+  created?: string;
+  /** Date last modified (read-only). */
+  modified?: string;
+  // ---- expand fields ----
+  /** Expand: contracts (effective cost rates & roles). */
+  contracts?: FloatContract[];
+  /** Expand: linked account, or null if no account. */
+  account?: FloatAccount | null;
+  /** Expand: list of account_ids that manage this person. */
+  managers?: number[] | null;
+}
+
+/**
+ * /clients endpoint.
+ */
+export interface FloatClient {
+  /** The ID of this client (read-only). */
+  client_id?: number;
+  name: string;
+}
+
+/**
+ * /projects endpoint.
+ * status: 0 = Draft, 1 = Tentative, 2 = Confirmed, 3 = Completed, 4 = Canceled.
+ * budget_type: 1 = Total hours, 2 = Total fee, 3 = Hourly fee.
+ * budget_priority: 0 = Project, 1 = Phase, 2 = Task.
+ * active: 1 = Active, 0 = Archived.
+ */
+export interface FloatProject {
+  /** Project ID (read-only). */
+  project_id?: number;
+  name: string;
+  project_code?: string;
+  client_id?: number;
+  color?: string;
+  notes?: string;
+  tags?: string[];
+  /** 1 = Total hours, 2 = Total fee, 3 = Hourly fee. */
+  budget_type?: number;
+  budget_total?: number | null;
+  /** @deprecated Use budget_priority. */
+  budget_per_phase?: number;
+  /** 0 = Project, 1 = Phase, 2 = Task. */
+  budget_priority?: number;
+  default_hourly_rate?: string;
+  /** 0 = Billable, 1 = Non-billable. */
+  non_billable?: number;
+  /** 0 = Draft, 1 = Tentative, 2 = Confirmed, 3 = Completed, 4 = Canceled. */
+  status?: number;
+  stage_id?: number;
+  /** @deprecated Use status. */
+  tentative?: number;
+  locked_task_list?: number;
+  /** 1 = Active, 0 = Archived. */
+  active?: number;
+  project_manager?: number;
+  all_pms_schedule?: number;
+  created?: string;
+  modified?: string;
+  start_date?: string;
+  end_date?: string | null;
+}
+
+/**
+ * /tasks endpoint — an allocation (Float internally calls it a task).
+ * status: 0 = Draft, 1 = Tentative, 2 = Confirmed, 3 = Complete.
+ * repeat_state: 0–9 (0 = No repeat, 1 = Weekly, …, 9 = Yearly).
+ */
+export interface FloatAllocation {
+  /** Allocation ID (read-only). */
+  task_id?: number;
+  root_task_id?: number;
+  parent_task_id?: number;
+  project_id: number;
+  phase_id?: number;
+  start_date: string;
+  end_date: string;
+  start_time?: string;
+  hours: number;
+  /** Assigned person; omit when using people_ids. */
+  people_id?: number;
+  /** One or more people assigned (ignored if people_id is set). */
+  people_ids?: number[];
+  /** 0 = Draft, 1 = Tentative, 2 = Confirmed, 3 = Complete. */
+  status?: number;
+  task_meta_id?: number;
+  name?: string;
+  notes?: string;
+  /** 0 = No repeat, 1 = Weekly, 2 = Monthly, 3–9 other frequencies. */
+  repeat_state?: number;
+  repeat_end_date?: string | null;
+  created_by?: number;
+  created?: string;
+  modified_by?: number;
+  modified?: string;
+}
+
+/**
+ * /timeoffs endpoint.
+ * repeat_state: same codes as FloatAllocation.repeat_state.
+ * status: 1 = Tentative, 2 = Confirmed.
+ */
+export interface FloatTimeoff {
+  /** Time-off ID (read-only). */
+  timeoff_id?: number;
+  timeoff_type_id: number;
+  start_date: string;
+  end_date: string;
+  start_time?: string;
+  hours: number;
+  timeoff_notes?: string;
+  /** 0 = No repeat, 1 = Weekly, 2 = Monthly, 3–9 other frequencies. */
+  repeat_state?: number;
+  repeat_end_date?: string | null;
+  /** 1 = Tentative, 2 = Confirmed. */
+  status?: number;
+  /** People assigned to this time-off. */
+  people_ids: number[];
+}
+
+// ---------------------------------------------------------------------------
+
 interface PaginationMeta {
   page: number;
   per_page: number;
@@ -21,8 +236,8 @@ interface PaginationMeta {
   page_count?: number;
 }
 
-interface FloatResult {
-  data: unknown;
+interface FloatResult<T = unknown> {
+  data: T;
   pagination?: PaginationMeta;
 }
 
@@ -41,10 +256,10 @@ function createFloatClient(opts: {
   userAgent: string;
   log: (...args: unknown[]) => void;
 }) {
-  return async function floatFetch(
+  return async function floatFetch<T = unknown>(
     path: string,
     query: Record<string, QueryValue> = {},
-  ): Promise<FloatResult> {
+  ): Promise<FloatResult<T>> {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(query)) {
       if (value === undefined || value === '') continue;
@@ -71,7 +286,7 @@ function createFloatClient(opts: {
       );
     }
 
-    const data = await res.json();
+    const data = await res.json<T>();
 
     // Float reports list pagination via X-Pagination-* response headers.
     const header = (name: string): number | undefined => {
@@ -95,8 +310,8 @@ function createFloatClient(opts: {
 }
 
 /** Canned responses used while the kernel smoke-tests the plugin. */
-const SMOKE_DATA: Record<string, unknown> = {
-  '/people': [{ people_id: 1, name: 'Ada Lovelace', email: 'ada@example.com', active: 1 }],
+const SMOKE_DATA: Record<string, FloatPerson[] | FloatProject[] | FloatAllocation[] | FloatTimeoff[] | FloatClient[]> = {
+  '/people': [{ people_id: 1, name: 'Ada Lovelace', email: 'ada@example.com', active: 1, people_type_id: 1 }],
   '/projects': [{ project_id: 1, name: 'Analytical Engine', client_id: 1, active: 1 }],
   '/tasks': [
     {
@@ -106,11 +321,10 @@ const SMOKE_DATA: Record<string, unknown> = {
       start_date: '2026-01-05',
       end_date: '2026-01-09',
       hours: 8,
-      name: 'Design',
-    },
+    } as FloatAllocation,
   ],
   '/timeoffs': [
-    { timeoff_id: 1, timeoff_type_id: 1, people_ids: [1], start_date: '2026-01-12', end_date: '2026-01-16' },
+    { timeoff_id: 1, timeoff_type_id: 1, people_ids: [1], start_date: '2026-01-12', end_date: '2026-01-16', hours: 8 },
   ],
   '/clients': [{ client_id: 1, name: 'Example Client' }],
 };
@@ -127,7 +341,7 @@ export async function activate(ctx: PluginContext): Promise<IntegrationHandle> {
 
   // Lazily resolved so activation succeeds even before the token exists; in
   // smoke mode we never touch the vault or the network at all.
-  let floatFetch: ((path: string, query?: Record<string, QueryValue>) => Promise<FloatResult>) | null =
+  let floatFetch: (<T = unknown>(path: string, query?: Record<string, QueryValue>) => Promise<FloatResult<T>>) | null =
     null;
 
   const call = async (
@@ -203,6 +417,35 @@ export async function activate(ctx: PluginContext): Promise<IntegrationHandle> {
       const { people_id } = (input ?? {}) as { people_id?: number };
       if (!people_id) throw new Error('people_id is required.');
       return call(`/people/${Math.floor(people_id)}`);
+    },
+  );
+
+  ctx.tools.register(
+    {
+      name: 'float_get_person_by_name',
+      description: 'Finds Float people whose name matches the given string. Returns all matching people (case-insensitive, partial match supported by the Float API).',
+      input_schema: {
+        type: 'object',
+        properties: {
+          name: { type: 'string', description: 'Full or partial name of the person to search for.' },
+          active: {
+            type: 'integer',
+            description: 'Optionally filter by status: 1 = active, 0 = archived. Omit for all.',
+          },
+          ...pagingProperties,
+        },
+        required: ['name'],
+      },
+    },
+    async (input) => {
+      const args = (input ?? {}) as Record<string, unknown>;
+      const name = args.name as string;
+      if (!name || !name.trim()) throw new Error('name is required.');
+      return call('/people', {
+        ...paging(args),
+        name: name.trim(),
+        active: args.active as number | undefined,
+      });
     },
   );
 
@@ -323,6 +566,7 @@ export async function activate(ctx: PluginContext): Promise<IntegrationHandle> {
     tools: [
       'float_list_people',
       'float_get_person',
+      'float_get_person_by_name',
       'float_list_projects',
       'float_get_project',
       'float_list_allocations',

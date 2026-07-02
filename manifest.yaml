@@ -11,7 +11,7 @@ identity:
   kind: "integration"
   domain: "float"
   name: "Float"
-  version: "0.1.0"                   # MUST equal package.json "version"
+  version: "0.3.0"                   # MUST equal package.json "version"
   description: "Read-only Float (float.com) integration: query people, projects, allocations, time off and clients from your resource plan."
   authors:
     - name: "OPTEN"
@@ -122,6 +122,33 @@ capabilities:
       type: "object"
       properties:
         data: { type: "object" }
+    side_effects: "read"
+    idempotent: true
+    timeout_ms: 15000
+
+  - id: "float_get_person_by_name"
+    description: "Finds Float people whose name matches the given string (case-insensitive, partial match)."
+    input_schema:
+      type: "object"
+      required: ["name"]
+      properties:
+        name:
+          type: "string"
+          description: "Full or partial name of the person to search for."
+        active:
+          type: "integer"
+          description: "Optionally filter by status: 1 = active, 0 = archived. Omit for all."
+        page:
+          type: "integer"
+          description: "Page number, starting at 1."
+        per_page:
+          type: "integer"
+          description: "Results per page (max 200)."
+    output_schema:
+      type: "object"
+      properties:
+        data: { type: "array" }
+        pagination: { type: "object" }
     side_effects: "read"
     idempotent: true
     timeout_ms: 15000
