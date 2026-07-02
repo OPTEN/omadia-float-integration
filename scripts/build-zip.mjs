@@ -107,12 +107,23 @@ for (const entry of INCLUDE) {
 const zipPath = join(pkgRoot, 'out', `${safeName}-${pkg.version}.zip`);
 rmSync(zipPath, { force: true });
 
-const zipRes = spawnSync('zip', ['-r', '-q', zipPath, stageName], {
-  cwd: join(pkgRoot, 'out'),
-  stdio: 'inherit',
-});
-if (zipRes.status !== 0) {
-  throw new Error('zip CLI failed — on Windows use `7z a` or PowerShell `Compress-Archive`');
+function tryZip(cmd, args) {
+  const res = spawnSync(cmd, args, { cwd: join(pkgRoot, 'out'), stdio: 'inherit' });
+  return res.status === 0;
+}
+
+const zipped =
+  tryZip('zip', ['-r', '-q', zipPath, stageName]) ||
+  tryZip('7z', ['a', '-tzip', '-bso0', zipPath, stageName]) ||
+  (process.platform === 'win32' &&
+    tryZip('powershell', [
+      '-NoProfile',
+      '-Command',
+      `Compress-Archive -Path '${stageName}' -DestinationPath '${zipPath}' -Force`,
+    ]));
+
+if (!zipped) {
+  throw new Error('could not create ZIP — install `zip` or `7z` (or PowerShell on Windows)');
 }
 
 console.log(`✓ built ${zipPath}`);
