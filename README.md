@@ -1,130 +1,79 @@
 <div align="center">
 
-# omadia plugin starter
+# omadia Float integration
 
-### Build your own [omadia](https://omadia.ai) plugin or channel, and package it into an uploadable ZIP with one command.
-
-A ready-to-fork template with two working examples and a build script that turns
-your code into the ZIP the omadia admin UI accepts. Clone it, fill in your logic,
-ship it.
+### `@opten/float-integration` — an [omadia](https://omadia.ai) integration plugin for [Float](https://www.float.com), the resource-planning tool.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](./LICENSE)
 [![Built for omadia](https://img.shields.io/badge/built%20for-omadia-2496ED.svg)](https://github.com/byte5ai/omadia)
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-[**Main repo**](https://github.com/byte5ai/omadia) · [**Website**](https://omadia.ai) · [**Plugin hub**](https://hub.omadia.ai) · [**Quickstart**](#quickstart) · [**Docs**](#documentation)
-
-🇩🇪 Diese Anleitung gibt es auch [auf Deutsch](./README.de.md).
-
 </div>
 
 ---
 
-omadia is an agentic OS: every agent, channel and integration is a **plugin**
-the host loads, configures and sandboxes at runtime. This repository is a
-ready-to-fork template with two working examples and a build script that turns
-your code into the ZIP the omadia admin UI accepts.
+Read-only access to your Float resource plan from omadia agents, via the
+[Float REST API v3](https://developer.float.com): people, projects,
+allocations (scheduled tasks), time off and clients.
 
----
+## Tools
 
-## What you can build
+| Tool | Float endpoint | Purpose |
+| --- | --- | --- |
+| `float_list_people` | `GET /people` | List team members (filter by status/department). |
+| `float_get_person` | `GET /people/{id}` | Fetch one person. |
+| `float_list_projects` | `GET /projects` | List projects (filter by status/client). |
+| `float_get_project` | `GET /projects/{id}` | Fetch one project. |
+| `float_list_allocations` | `GET /tasks` | Who works on what, when, for how many hours. |
+| `float_list_timeoffs` | `GET /timeoffs` | Vacation, sick leave and other time off. |
+| `float_list_clients` | `GET /clients` | List clients. |
 
-| Kind | What it is | Entry point | Example |
-| --- | --- | --- | --- |
-| **Agent** | A skill with tools the orchestrator can call. | `activate(ctx)` | see the integration example, same shape |
-| **Channel** | A surface (Discord, Slack, a webhook…) that routes user messages in and replies back out. | `activate(ctx, core)` | [`examples/channel`](./examples/channel) |
-| **Integration** | A connector that exposes an external system as tools/services. | `activate(ctx)` | [`examples/float-integration`](./examples/float-integration) |
+All tools are read-only (`side_effects: "read"`, idempotent) and support
+pagination (`page`, `per_page`; metadata is returned from Float's
+`X-Pagination-*` headers). The plugin never creates, changes or deletes
+anything in your Float account.
 
-All three share one contract: export an `async activate(...)` that returns a
-handle with `close()`. The difference is what they declare in `manifest.yaml`
-and which `ctx` accessors they use.
+## Setup
 
----
+The install form asks for a **Float API token** (created in Float under
+*Team Settings → Integrations → API*; requires an Admin/Account Owner role).
+The token is stored in the omadia vault and read via `ctx.secrets`. An
+optional contact email is sent in the `User-Agent` header, as Float requests.
 
-## Quickstart
+Network access is limited to `api.float.com`
+(`permissions.network.outbound`); all traffic goes through `ctx.http`.
+
+## Build & install
 
 ```bash
 # Node 22 is pinned via .nvmrc
 nvm use            # or: install Node >= 20
 
-npm install        # installs the shared toolchain (workspaces)
-
-# Pick an example, build its upload ZIP:
-npm run build:float      # → examples/float-integration/out/opten-float-integration-0.1.0.zip
-npm run build:channel    # → examples/channel/out/acme-channel-webhook-0.1.0.zip
-
-# …or typecheck / build everything:
+npm install
 npm run typecheck
-npm run build
+npm run build      # → out/opten-float-integration-<version>.zip
 ```
 
-Then open the omadia **admin UI → Store → Upload** and drop the ZIP in.
-
-> ℹ️ Two ways to ship a plugin. Upload the ZIP in the admin UI, or publish it to
-> the **omadia hub** at [hub.omadia.ai](https://hub.omadia.ai) and install it
-> from there on any host. The ZIP you build here is exactly what both accept.
-
----
-
-## How it fits together
-
-```
-your code (src/plugin.ts)
-        │   esbuild bundle  (host-provided peers stay external)
-        ▼
-   dist/plugin.js  +  manifest.yaml  +  skills/  +  assets/
-        │   zip
-        ▼
-   out/<id>-<version>.zip  ──upload──▶  omadia host
-                                          loads dist/plugin.js
-                                          calls activate(ctx[, core])
-```
-
-The host validates the manifest, checks permissions, and calls your
-`activate`. Every external effect (secrets, network, filesystem, memory) is
-handed to you through `ctx`, scoped to what your manifest declares.
-
----
+Upload the ZIP in the omadia **admin UI → Store → Upload**, paste your Float
+API token into the setup form, and prompt an agent — e.g.
+*"Who is allocated to the website relaunch project next week?"*
 
 ## Repository layout
 
 ```
-omadia-plugin-starter/
-├── README.md / README.de.md     ← you are here
-├── docs/en/ · docs/de/          ← full guides (bilingual)
-├── scripts/build-zip.mjs        ← the esbuild→zip build (shared by examples)
-├── tsconfig.base.json           ← shared compiler config
-├── types/                       ← local SDK type stubs (compile offline)
-│   ├── omadia-plugin-api.d.ts
-│   └── omadia-channel-sdk.d.ts
-└── examples/
-    ├── float-integration/       ← @opten/float-integration
-    └── channel/                 ← @acme/channel-webhook
+omadia-float-integration/
+├── manifest.yaml             ← identity, setup form, capabilities, permissions
+├── src/plugin.ts             ← activate(ctx); Float API client + the 7 tools
+├── skills/system-prompt.md   ← prompt-partial shaping how agents use the tools
+├── assets/icon.svg           ← store icon
+├── scripts/build-zip.mjs     ← esbuild → ZIP build
+└── types/                    ← local @omadia/plugin-api type stub (compile offline)
 ```
 
-### About the SDK type stubs
-
-`@omadia/plugin-api` and `@omadia/channel-sdk` are **provided by the omadia
-host at runtime**. They are not published to npm, so you neither install nor
-bundle them. To let your plugin typecheck offline, this repo ships faithful
-type stubs in [`types/`](./types). The build marks the real packages as
-`external`, so the host supplies the genuine implementations. Keep the stubs in
-sync with the omadia version you target.
-
----
-
-## Documentation
-
-| Guide | English | Deutsch |
-| --- | --- | --- |
-| Getting started | [01](./docs/en/01-getting-started.md) | [01](./docs/de/01-erste-schritte.md) |
-| Build an agent plugin | [02](./docs/en/02-build-an-agent-plugin.md) | [02](./docs/de/02-agent-plugin-bauen.md) |
-| Build a channel | [03](./docs/en/03-build-a-channel.md) | [03](./docs/de/03-channel-bauen.md) |
-| Manifest & packaging | [04](./docs/en/04-manifest-and-packaging.md) | [04](./docs/de/04-manifest-und-packaging.md) |
-
----
+`@omadia/plugin-api` is provided by the omadia host at runtime — it is not
+published to npm. The type stub in [`types/`](./types) lets the plugin
+typecheck offline; the build marks the real package as `external`.
 
 ## License
 
-[MIT](./LICENSE). Fork it, ship it, sell it. Replace the `@acme/*`
-placeholders and the `authors` block with your own before you publish.
+[MIT](./LICENSE)

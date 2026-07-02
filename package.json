@@ -1,8 +1,9 @@
 {
-  "name": "omadia-float-integration",
+  "name": "@opten/float-integration",
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "main": "dist/plugin.js",
   "description": "Omadia integration plugin for Float (float.com): read-only access to people, projects, allocations, time off and clients.",
   "license": "MIT",
   "homepage": "https://github.com/OPTEN/omadia-float-integration",
@@ -10,15 +11,10 @@
     "type": "git",
     "url": "https://github.com/OPTEN/omadia-float-integration.git"
   },
-  "workspaces": [
-    "examples/*"
-  ],
   "scripts": {
-    "typecheck": "npm run typecheck --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
-    "build:float": "npm run build -w examples/float-integration",
-    "build:channel": "npm run build -w examples/channel",
-    "clean": "npm run clean --workspaces --if-present"
+    "typecheck": "tsc --noEmit",
+    "build": "node scripts/build-zip.mjs",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true});require('node:fs').rmSync('out',{recursive:true,force:true})\""
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
@@ -29,3 +25,4 @@
     "node": ">=20"
   }
 }
+

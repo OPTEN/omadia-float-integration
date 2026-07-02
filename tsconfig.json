@@ -14,10 +14,13 @@
     "resolveJsonModule": true,
     "declaration": false,
     "sourceMap": false,
+    "rootDir": "./src",
+    "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@omadia/plugin-api": ["./types/omadia-plugin-api.d.ts"],
-      "@omadia/channel-sdk": ["./types/omadia-channel-sdk.d.ts"]
+      "@omadia/plugin-api": ["./types/omadia-plugin-api.d.ts"]
     }
-  }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "out"]
 }
