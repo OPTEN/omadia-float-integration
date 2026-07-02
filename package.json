@@ -16,7 +16,7 @@
   "scripts": {
     "typecheck": "npm run typecheck --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
-    "build:agent": "npm run build -w examples/agent-plugin",
+    "build:float": "npm run build -w examples/float-integration",
     "build:channel": "npm run build -w examples/channel",
     "clean": "npm run clean --workspaces --if-present"
   },

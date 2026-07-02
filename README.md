@@ -31,9 +31,9 @@ your code into the ZIP the omadia admin UI accepts.
 
 | Kind | What it is | Entry point | Example |
 | --- | --- | --- | --- |
-| **Agent** | A skill with tools the orchestrator can call. | `activate(ctx)` | [`examples/agent-plugin`](./examples/agent-plugin) |
+| **Agent** | A skill with tools the orchestrator can call. | `activate(ctx)` | see the integration example, same shape |
 | **Channel** | A surface (Discord, Slack, a webhook…) that routes user messages in and replies back out. | `activate(ctx, core)` | [`examples/channel`](./examples/channel) |
-| **Integration** | A connector that exposes an external system as tools/services. | `activate(ctx)` | see the agent example, same shape |
+| **Integration** | A connector that exposes an external system as tools/services. | `activate(ctx)` | [`examples/float-integration`](./examples/float-integration) |
 
 All three share one contract: export an `async activate(...)` that returns a
 handle with `close()`. The difference is what they declare in `manifest.yaml`
@@ -50,7 +50,7 @@ nvm use            # or: install Node >= 20
 npm install        # installs the shared toolchain (workspaces)
 
 # Pick an example, build its upload ZIP:
-npm run build:agent      # → examples/agent-plugin/out/acme-agent-hello-0.1.0.zip
+npm run build:float      # → examples/float-integration/out/acme-integration-float-0.1.0.zip
 npm run build:channel    # → examples/channel/out/acme-channel-webhook-0.1.0.zip
 
 # …or typecheck / build everything:
@@ -98,7 +98,7 @@ omadia-plugin-starter/
 │   ├── omadia-plugin-api.d.ts
 │   └── omadia-channel-sdk.d.ts
 └── examples/
-    ├── agent-plugin/            ← @acme/agent-hello
+    ├── float-integration/       ← @acme/integration-float
     └── channel/                 ← @acme/channel-webhook
 ```
 

@@ -2,14 +2,15 @@
 
 An **agent** is a skill the orchestrator can pick and call. It declares one or
 more tools (`capabilities`) and implements them in code. The worked example is
-[`examples/agent-plugin`](../../examples/agent-plugin) — `@acme/agent-hello`.
+[`examples/float-integration`](../../examples/float-integration) — `@acme/integration-float`,
+a read-only connector for the Float resource-planning API.
 
 ## The contract
 
 ```ts
 import type { PluginContext } from '@omadia/plugin-api';
 
-export const AGENT_ID = '@acme/agent-hello' as const;
+export const AGENT_ID = '@acme/integration-float' as const;
 
 export interface AgentHandle {
   close(): Promise<void>;
@@ -112,7 +113,7 @@ Ship reusable prompt fragments in `skills/` and reference them in the manifest:
 
 ```yaml
 skills:
-  - id: "hello_system_prompt"
+  - id: "float_system_prompt"
     kind: "prompt_partial"
     path: "skills/system-prompt.md"
     shareable: false
@@ -124,12 +125,12 @@ other agents reference the partial.
 ## Build & install
 
 ```bash
-npm run build -w examples/agent-plugin
-# → examples/agent-plugin/out/acme-agent-hello-0.1.0.zip
+npm run build -w examples/float-integration
+# → examples/float-integration/out/acme-integration-float-0.1.0.zip
 ```
 
 Upload via **admin UI → Store → Upload**, fill the setup form, and prompt the
-agent (e.g. *"Say hello to Ada."*).
+agent (e.g. *"List our active projects in Float."*).
 
 ## Alternative: the toolkit pattern
 

@@ -55,7 +55,7 @@ Du greifst nie zu Globals wie `process.env` oder rohem `fetch`. Alles hängt an
 Aus dem Repo-Root:
 
 ```bash
-npm run build:agent      # ein Beispiel
+npm run build:float      # ein Beispiel
 npm run build            # alle Beispiele (Workspaces)
 ```
 

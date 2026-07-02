@@ -1,0 +1,291 @@
+schema_version: "1"
+
+# ===========================================================================
+# @acme/integration-float — Omadia integration for Float (float.com), the
+# resource-planning tool. Read-only v1: people, projects, allocations,
+# time off, clients.
+# Rename every "@acme/integration-float" / "Your Name" placeholder before
+# publishing.
+# ===========================================================================
+
+identity:
+  id: "@acme/integration-float"      # MUST equal package.json "name"
+  kind: "integration"
+  domain: "float"
+  name: "Float"
+  version: "0.1.0"                   # MUST equal package.json "version"
+  description: "Read-only Float (float.com) integration: query people, projects, allocations, time off and clients from your resource plan."
+  authors:
+    - name: "Your Name"
+      email: "you@example.com"
+      url: "https://example.com"
+  license: "MIT"
+  icon: "./assets/icon.svg"
+  categories:
+    - "productivity"
+    - "project-management"
+
+compat:
+  core: ">=1.0 <2.0"
+  node: ">=20"
+
+depends_on: []
+
+lifecycle:
+  entry: "dist/plugin.js"            # the module that exports activate(ctx)
+  uninstall_policy:
+    entities: "delete"
+    memory: "delete"
+    secrets: "delete"
+
+# Operator-filled install form. `type: secret` fields go to the vault and are
+# read via ctx.secrets; everything else is read via ctx.config.
+setup:
+  guide:
+    en: |
+      ## Connect Omadia to Float
+
+      1. Sign in to your **Float** account (an Admin or Account Owner role is
+         required to create API tokens).
+      2. Open **Team Settings → Integrations → API** (or visit
+         https://developer.float.com for details).
+      3. Generate a **personal API token** and copy it.
+      4. Paste the token into the field below. Optionally add a contact
+         email — Float asks API clients to identify themselves via the
+         `User-Agent` header.
+
+      This integration is **read-only**: it never creates, changes or deletes
+      anything in your Float account.
+    de: |
+      ## Omadia mit Float verbinden
+
+      1. Melde dich in deinem **Float**-Konto an (zum Erstellen von API-Tokens
+         ist eine Admin- oder Account-Owner-Rolle nötig).
+      2. Öffne **Team Settings → Integrations → API** (Details unter
+         https://developer.float.com).
+      3. Erzeuge einen **persönlichen API-Token** und kopiere ihn.
+      4. Trage den Token unten ein. Optional kannst du eine Kontakt-E-Mail
+         angeben — Float bittet API-Clients, sich über den `User-Agent`-Header
+         zu identifizieren.
+
+      Diese Integration ist **nur lesend**: Sie erstellt, ändert oder löscht
+      nichts in deinem Float-Konto.
+  fields:
+    - key: "api_token"
+      type: "secret"
+      label: "Float API token"
+      help: "Personal API token from Float (Team Settings → Integrations → API)."
+      required: true
+    - key: "user_agent_contact"
+      type: "string"
+      label: "Contact email (optional)"
+      help: "Sent in the User-Agent header so Float can contact you about API usage."
+      required: false
+  self_test: true
+
+# Each capability is a tool the orchestrator may call. `id` + `input_schema`
+# MUST match a ctx.tools.register(...) call in src/plugin.ts.
+capabilities:
+  - id: "float_list_people"
+    description: "Lists people (team members) in Float, with optional filters."
+    input_schema:
+      type: "object"
+      properties:
+        active:
+          type: "integer"
+          description: "Filter by status: 1 = active, 0 = archived. Omit for all."
+        department_id:
+          type: "integer"
+          description: "Filter by department id."
+        page:
+          type: "integer"
+          description: "Page number, starting at 1."
+        per_page:
+          type: "integer"
+          description: "Results per page (max 200)."
+    output_schema:
+      type: "object"
+      properties:
+        data: { type: "array" }
+        pagination: { type: "object" }
+    side_effects: "read"
+    idempotent: true
+    timeout_ms: 15000
+
+  - id: "float_get_person"
+    description: "Fetches a single Float person by id."
+    input_schema:
+      type: "object"
+      required: ["people_id"]
+      properties:
+        people_id:
+          type: "integer"
+          description: "The Float person id."
+    output_schema:
+      type: "object"
+      properties:
+        data: { type: "object" }
+    side_effects: "read"
+    idempotent: true
+    timeout_ms: 15000
+
+  - id: "float_list_projects"
+    description: "Lists projects in Float, with optional filters."
+    input_schema:
+      type: "object"
+      properties:
+        active:
+          type: "integer"
+          description: "Filter by status: 1 = active, 0 = archived. Omit for all."
+        client_id:
+          type: "integer"
+          description: "Filter by client id."
+        page:
+          type: "integer"
+          description: "Page number, starting at 1."
+        per_page:
+          type: "integer"
+          description: "Results per page (max 200)."
+    output_schema:
+      type: "object"
+      properties:
+        data: { type: "array" }
+        pagination: { type: "object" }
+    side_effects: "read"
+    idempotent: true
+    timeout_ms: 15000
+
+  - id: "float_get_project"
+    description: "Fetches a single Float project by id."
+    input_schema:
+      type: "object"
+      required: ["project_id"]
+      properties:
+        project_id:
+          type: "integer"
+          description: "The Float project id."
+    output_schema:
+      type: "object"
+      properties:
+        data: { type: "object" }
+    side_effects: "read"
+    idempotent: true
+    timeout_ms: 15000
+
+  - id: "float_list_allocations"
+    description: "Lists scheduled allocations (Float tasks): who works on which project, when, and for how many hours."
+    input_schema:
+      type: "object"
+      properties:
+        start_date:
+          type: "string"
+          description: "Only allocations on/after this date (YYYY-MM-DD)."
+        end_date:
+          type: "string"
+          description: "Only allocations on/before this date (YYYY-MM-DD)."
+        people_id:
+          type: "integer"
+          description: "Filter by person id."
+        project_id:
+          type: "integer"
+          description: "Filter by project id."
+        page:
+          type: "integer"
+          description: "Page number, starting at 1."
+        per_page:
+          type: "integer"
+          description: "Results per page (max 200)."
+    output_schema:
+      type: "object"
+      properties:
+        data: { type: "array" }
+        pagination: { type: "object" }
+    side_effects: "read"
+    idempotent: true
+    timeout_ms: 15000
+
+  - id: "float_list_timeoffs"
+    description: "Lists time-off entries (vacation, sick leave, …) in Float."
+    input_schema:
+      type: "object"
+      properties:
+        start_date:
+          type: "string"
+          description: "Only time off on/after this date (YYYY-MM-DD)."
+        end_date:
+          type: "string"
+          description: "Only time off on/before this date (YYYY-MM-DD)."
+        people_id:
+          type: "integer"
+          description: "Filter by person id."
+        page:
+          type: "integer"
+          description: "Page number, starting at 1."
+        per_page:
+          type: "integer"
+          description: "Results per page (max 200)."
+    output_schema:
+      type: "object"
+      properties:
+        data: { type: "array" }
+        pagination: { type: "object" }
+    side_effects: "read"
+    idempotent: true
+    timeout_ms: 15000
+
+  - id: "float_list_clients"
+    description: "Lists clients in Float."
+    input_schema:
+      type: "object"
+      properties:
+        page:
+          type: "integer"
+          description: "Page number, starting at 1."
+        per_page:
+          type: "integer"
+          description: "Results per page (max 200)."
+    output_schema:
+      type: "object"
+      properties:
+        data: { type: "array" }
+        pagination: { type: "object" }
+    side_effects: "read"
+    idempotent: true
+    timeout_ms: 15000
+
+# Natural-language guidance the orchestrator uses to decide when to pick this
+# integration and how to prompt it.
+playbook:
+  when_to_use: |
+    Use when the user asks about resource planning data managed in Float:
+    who is scheduled/allocated to which project and when, team capacity,
+    upcoming or past time off, the list of people, projects or clients.
+    Read-only — it cannot create or change schedules.
+  example_prompts:
+    - "Who is allocated to the website relaunch project next week?"
+    - "Show all upcoming time off for the team."
+    - "List our active projects in Float."
+    - "How many hours is Ada scheduled for in January?"
+
+# Prompt-partials bundled into the ZIP and loaded at activation. They shape the
+# integration's role/tone without touching code.
+skills:
+  - id: "float_system_prompt"
+    kind: "prompt_partial"
+    path: "skills/system-prompt.md"
+    description: "Role and behavior for the Float integration."
+    shareable: false
+
+# Least-privilege: only outbound HTTPS to the Float API.
+permissions:
+  memory:
+    reads: []
+    writes: []
+  graph:
+    reads: []
+    writes: []
+  network:
+    outbound:
+      - "api.float.com"
+  filesystem:
+    scratch: false

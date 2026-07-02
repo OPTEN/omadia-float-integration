@@ -55,7 +55,7 @@ You never reach for globals like `process.env` or raw `fetch`. Everything is on
 Run from the repo root:
 
 ```bash
-npm run build:agent      # one example
+npm run build:float      # one example
 npm run build            # every example (workspaces)
 ```
 

@@ -1,10 +1,10 @@
 {
-  "name": "@acme/agent-hello",
+  "name": "@acme/integration-float",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "main": "dist/plugin.js",
-  "description": "A minimal example Omadia agent that exposes a single greeting tool.",
+  "description": "Read-only Float (float.com) integration: query people, projects, allocations, time off and clients from your resource plan.",
   "license": "MIT",
   "scripts": {
     "typecheck": "tsc --noEmit",

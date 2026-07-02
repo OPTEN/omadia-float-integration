@@ -26,9 +26,9 @@ omadia ist ein agentisches OS: Jeder Agent, jeder Channel und jede Integration i
 
 | Art | Was es ist | Einstieg | Beispiel |
 | --- | --- | --- | --- |
-| **Agent** | Eine Fähigkeit mit Tools, die der Orchestrator aufrufen kann. | `activate(ctx)` | [`examples/agent-plugin`](./examples/agent-plugin) |
+| **Agent** | Eine Fähigkeit mit Tools, die der Orchestrator aufrufen kann. | `activate(ctx)` | siehe Integrations-Beispiel, gleiche Form |
 | **Channel** | Eine Oberfläche (Discord, Slack, ein Webhook), die Nutzer-Nachrichten rein- und Antworten rausroutet. | `activate(ctx, core)` | [`examples/channel`](./examples/channel) |
-| **Integration** | Ein Connector, der ein externes System als Tools/Services bereitstellt. | `activate(ctx)` | siehe Agent-Beispiel, gleiche Form |
+| **Integration** | Ein Connector, der ein externes System als Tools/Services bereitstellt. | `activate(ctx)` | [`examples/float-integration`](./examples/float-integration) |
 
 Alle drei teilen einen Vertrag: Du exportierst ein `async activate(...)`, das ein Handle mit `close()` zurückgibt. Der Unterschied liegt darin, was du in der `manifest.yaml` deklarierst und welche `ctx`-Accessoren du nutzt.
 
@@ -43,7 +43,7 @@ nvm use            # oder: Node >= 20 installieren
 npm install        # installiert die geteilte Toolchain (Workspaces)
 
 # Beispiel wählen, Upload-ZIP bauen:
-npm run build:agent      # -> examples/agent-plugin/out/acme-agent-hello-0.1.0.zip
+npm run build:float      # -> examples/float-integration/out/acme-integration-float-0.1.0.zip
 npm run build:channel    # -> examples/channel/out/acme-channel-webhook-0.1.0.zip
 
 # oder alles typechecken / bauen:
@@ -90,7 +90,7 @@ omadia-plugin-starter/
 │   ├── omadia-plugin-api.d.ts
 │   └── omadia-channel-sdk.d.ts
 └── examples/
-    ├── agent-plugin/            <- @acme/agent-hello
+    ├── float-integration/       <- @acme/integration-float
     └── channel/                 <- @acme/channel-webhook
 ```
 
